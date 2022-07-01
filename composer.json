@@ -1,0 +1,65 @@
+{
+    "name": "platine-php/expression",
+    "description": "Platine Expression is an expression parser, evaluator with support of custom operators and functions",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["application", "website", "development", "framework", "php", "platine", "expression", "math", "parser", "evaluator"],
+    "authors": [
+        {
+            "name": "NGUEREZA Tony",
+            "email": "nguerezatony@gmail.com",
+            "homepage": "http://www.iacademy.cf",
+            "role": "developer"
+        }
+    ],
+
+    "support": {
+        "issues": "https://github.com/platine-php/expression/issues",
+        "source": "https://github.com/platine-php/expression"
+    },
+	
+    "require": {
+        "php": "^7.4 || ^8"
+    },
+	
+    "require-dev": {
+        "phpmd/phpmd": "@stable",
+        "phpunit/phpunit": "^9.5",
+        "platine-php/dev": "1.0.x-dev",
+        "squizlabs/php_codesniffer": "3.*",
+        "phpstan/phpstan": "0.12.x-dev"
+    },
+    
+    "autoload": {
+        "psr-4":{
+            "Platine\\Expression\\": "src/"
+        }
+    },
+    
+    "autoload-dev": {
+        "psr-4":{
+            "Platine\\Test\\": "tests"
+        }
+    },
+    
+    "config": {
+        "sort-packages": true
+    },
+    
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0.x-dev"
+        }
+    },
+
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "static": "phpstan analyze",
+        "check": "phpcs",
+        "check-fix": "phpcbf",
+        "analyze": "phpmd src xml phpmd.xml"
+    },
+	
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
