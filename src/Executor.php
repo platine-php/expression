@@ -403,7 +403,12 @@ class Executor
     protected function defaultFunctions(): array
     {
         return [
-            'abs' => static fn($arg) => abs($arg),
+            'abs' => static function ($arg) {
+                if ((int) $arg == $arg) {
+                    return abs(intval($arg));
+                }
+                return abs(floatval($arg));
+            },
             'array' => static fn(...$args) => $args,
             'avg' => static function ($arg1, ...$args) {
                 if (is_array($arg1)) {
@@ -417,8 +422,18 @@ class Executor
                 $args = [$arg1, ...$args];
                 return array_sum($args) / count($args);
             },
-            'ceil' => static fn($arg) => ceil($arg),
-            'floor' => static fn($arg) => floor($arg),
+            'ceil' => static function ($arg) {
+                if ((int) $arg == $arg) {
+                    return ceil(intval($arg));
+                }
+                return ceil(floatval($arg));
+            },
+            'floor' => static function ($arg) {
+                if ((int) $arg == $arg) {
+                    return floor(intval($arg));
+                }
+                return floor(floatval($arg));
+            },
             'exp' => static fn($arg) => exp(floatval($arg)),
             'ln' => static fn($arg) => log(floatval($arg)),
             'lg' => static fn($arg) => log10($arg),
@@ -444,7 +459,12 @@ class Executor
                 return min(is_array($arg1) ? $arg1 : [$arg1, ...$args]);
             },
             'pow' => static fn($arg1, $arg2) => $arg1 ** $arg2,
-            'round' => static fn($arg, int $precision = 0) => round($arg, $precision),
+            'round' => static function ($arg, int $precision = 0) {
+                if ((int) $arg == $arg) {
+                    return round(intval($arg), intval($precision));
+                }
+                return round(floatval($arg), intval($precision));
+            },
             'pi' => static fn() => M_PI,
         ];
     }
