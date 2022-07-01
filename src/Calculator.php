@@ -104,7 +104,7 @@ class Calculator
                 $value = null;
                 if (array_key_exists($variable, $variables)) {
                     $value = $variables[$variable];
-                } elseif ($variableNotFoundHandler) {
+                } elseif ($variableNotFoundHandler !== null) {
                     $value = call_user_func($variableNotFoundHandler, $variable);
                 } else {
                     throw new UnknownVariableException(sprintf(

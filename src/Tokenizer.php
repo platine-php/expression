@@ -301,7 +301,8 @@ class Tokenizer
                         if (count($this->tokens) > 0) {
                             if (Token::OPERATOR === $this->tokens[count($this->tokens) - 1]->getType()) {
                                 $token = $this->tokens[count($this->tokens) - 1];
-                                $token->setValue($token->getValue() . $ch);
+                                $this->tokens[count($this->tokens) - 1]
+                                        ->setValue($token->getValue() . $ch);
                             } else {
                                 $this->tokens[] = new Token(Token::OPERATOR, $ch);
                             }
@@ -330,7 +331,6 @@ class Tokenizer
 
         /** @var SplStack<Int> $paramCounter */
         $paramCounter = new SplStack();
-
         foreach ($this->tokens as $token) {
             switch ($token->getType()) {
                 case Token::LITERAL:
@@ -339,14 +339,14 @@ class Tokenizer
                     $tokens[] = $token;
 
                     if ($paramCounter->count() > 0 && $paramCounter->top() === 0) {
-                        $paramCounter->push($paramCounter->top() + 1);
+                        $paramCounter->push($paramCounter->pop() + 1);
                     }
 
                     break;
 
                 case Token::FUNCTION:
                     if ($paramCounter->count() > 0 && $paramCounter->top() === 0) {
-                        $paramCounter->push($paramCounter->top() + 1);
+                        $paramCounter->push($paramCounter->pop() + 1);
                     }
                     $stack->push($token);
                     $paramCounter->push(0);
@@ -365,7 +365,7 @@ class Tokenizer
                         }
                         $tokens[] = $stack->pop();
                     }
-                    $paramCounter->push($paramCounter->top() + 1);
+                    $paramCounter->push($paramCounter->pop() + 1);
                     break;
 
                 case Token::OPERATOR:

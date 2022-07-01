@@ -19,51 +19,56 @@ use Platine\Expression\Executor;
  */
 class ExecutorTest extends PlatineTestCase
 {
-    
     /**
      * @dataProvider expressionsDataProvider
      */
-    public function testCalculating(string $expression) : void
+    public function testCalculating(string $expression): void
     {
         $o = new Executor();
 
         /** @var float $phpResult */
         eval('$phpResult = ' . $expression . ';');
-      
+
         try {
             $result = $o->execute($expression);
         } catch (Exception $e) {
-            $this->fail(sprintf('Exception: %s (%s:%d), expression was: %s', get_class($e), $e->getFile(), $e->getLine(), $expression));
+            $this->fail(sprintf(
+                'Exception: %s (%s:%d), expression was: %s',
+                get_class($e),
+                $e->getFile(),
+                $e->getLine(),
+                $expression
+            ));
         }
         $this->assertEquals($phpResult, $result, "Expression was: {$expression}");
     }
-    
+
     /**
      * @dataProvider incorrectExpressionsDataProvider
      */
-    public function testIncorrectExpressionException(string $expression) : void
+    public function testIncorrectExpressionException(string $expression): void
     {
         $o = new Executor();
         $o->setVariables(['a' => 12, 'b' => 24]);
         $this->expectException(IncorrectExpressionException::class);
         $o->execute($expression);
     }
-    
-    public function testUnknownFunctionException() : void
+
+    public function testUnknownFunctionException(): void
     {
         $o = new Executor();
         $this->expectException(UnknownFunctionException::class);
         $o->execute('1 * tnh("foobar") - 3');
     }
-    
-    public function testZeroDivision() : void
+
+    public function testZeroDivision(): void
     {
         $o = new Executor();
         $this->expectException(DivisionByZeroException::class);
         $o->execute('10 / 0');
     }
-    
-    public function testUnaryOperators() : void
+
+    public function testUnaryOperators(): void
     {
         $o = new Executor();
         $this->assertEquals(5, $o->execute('+5'));
@@ -73,8 +78,8 @@ class ExecutorTest extends PlatineTestCase
         $this->assertEquals(-5, $o->execute('+(-5)'));
         $this->assertEquals(-5, $o->execute('-(3+2)'));
     }
-    
-    public function testVariableIncorrectExpressionException() : void
+
+    public function testVariableIncorrectExpressionException(): void
     {
         $o = new Executor();
         $o->setVariable('four', 4);
@@ -83,14 +88,14 @@ class ExecutorTest extends PlatineTestCase
         $this->assertEquals(0.0, $o->execute('$'));
         $this->assertEquals(0.0, $o->execute('$ + $four'));
     }
-    
-    public function testExponentiation() : void
+
+    public function testExponentiation(): void
     {
         $o = new Executor();
         $this->assertEquals(100, $o->execute('10 ^ 2'));
     }
-    
-    public function testStringEscape() : void
+
+    public function testStringEscape(): void
     {
         $o = new Executor();
         $this->assertEquals("test\string", $o->execute('"test\string"'));
@@ -106,21 +111,21 @@ class ExecutorTest extends PlatineTestCase
         $this->assertEquals("'teststring", $o->execute("'\'teststring'"));
         $this->assertEquals("teststring'", $o->execute("'teststring\''"));
 
-        $o->addFunction('concat', static function($arg1, $arg2) {
+        $o->addFunction('concat', static function ($arg1, $arg2) {
             return $arg1 . $arg2;
         });
         $this->assertEquals('test"ing', $o->execute('concat("test\"","ing")'));
         $this->assertEquals("test'ing", $o->execute("concat('test\'','ing')"));
     }
-    
-    public function testArrays() : void
+
+    public function testArrays(): void
     {
         $o = new Executor();
         $this->assertEquals([1, 5, 2], $o->execute('array(1, 5, 2)'));
         $this->assertEquals([1, 5, 2], $o->execute('[1, 5, 2]'));
         $this->assertEquals(max([1, 5, 2]), $o->execute('max([1, 5, 2])'));
         $this->assertEquals(max([1, 5, 2]), $o->execute('max(array(1, 5, 2))'));
-        $o->addFunction('arr_with_max_elements', static function($arg1, ...$args) {
+        $o->addFunction('arr_with_max_elements', static function ($arg1, ...$args) {
             $args = is_array($arg1) ? $arg1 : [$arg1, ...$args];
             usort($args, static fn($arr1, $arr2) => count($arr2) <=> count($arr1));
 
@@ -128,9 +133,9 @@ class ExecutorTest extends PlatineTestCase
         });
         $this->assertEquals([3, 3, 3], $o->execute('arr_with_max_elements([[1],array(2,2),[3,3,3]])'));
     }
-    
+
     /**
-     * Data provider for incorrect expression 
+     * Data provider for incorrect expression
      * @return array
      */
     public function incorrectExpressionsDataProvider(): array
@@ -156,9 +161,9 @@ class ExecutorTest extends PlatineTestCase
     /**
      * Expressions data provider
      *
-     * Most tests can go in here.  The idea is that each expression will be 
+     * Most tests can go in here.  The idea is that each expression will be
      * evaluated by Executor and by PHP with eval().
-     * The results should be the same.  If they are not, then the test fails.  
+     * The results should be the same.  If they are not, then the test fails.
      * No need to add extra test unless you are doing
      * something more complex and not a simple mathematical expression.
      */
@@ -200,8 +205,9 @@ class ExecutorTest extends PlatineTestCase
           ['pi()'],
           ['pow(1.5, 3.5)'],
           ['round(1.5)'],
+          ['round(1.5 + 1)'],
           ['sqrt(1.5)'],
-          
+
           ['0.1 + 0.2'],
           ['0.1 + 0.2 - 0.3'],
           ['1 + 2'],
