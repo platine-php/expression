@@ -13,7 +13,7 @@ use Platine\Expression\Token;
  * CustomFunction class tests
  *
  * @group core
- * @group workflow
+ * @group expression
  */
 class CustomFunctionTest extends PlatineTestCase
 {

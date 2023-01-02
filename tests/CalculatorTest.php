@@ -18,7 +18,7 @@ use Platine\Expression\Token;
  * Calculator class tests
  *
  * @group core
- * @group workflow
+ * @group expression
  */
 class CalculatorTest extends PlatineTestCase
 {

@@ -15,7 +15,7 @@ use Platine\Expression\Executor;
  * Executor class tests
  *
  * @group core
- * @group workflow
+ * @group expression
  */
 class ExecutorTest extends PlatineTestCase
 {

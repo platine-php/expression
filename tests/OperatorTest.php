@@ -13,7 +13,7 @@ use Platine\Expression\Token;
  * Operator class tests
  *
  * @group core
- * @group workflow
+ * @group expression
  */
 class OperatorTest extends PlatineTestCase
 {

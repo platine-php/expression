@@ -11,7 +11,7 @@ use Platine\Expression\Token;
  * Token class tests
  *
  * @group core
- * @group workflow
+ * @group expression
  */
 class TokenTest extends PlatineTestCase
 {
