@@ -6,6 +6,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/platine-php/expression/v/unstable)](https://packagist.org/packages/platine-php/expression)
 [![Total Downloads](https://poser.pugx.org/platine-php/expression/downloads)](https://packagist.org/packages/platine-php/expression)
 [![License](https://poser.pugx.org/platine-php/expression/license)](https://packagist.org/packages/platine-php/expression)  
+![Tests](https://github.com/platine-php/expression/actions/workflows/ci.yml/badge.svg)
 [![Quality Score](https://img.shields.io/scrutinizer/g/platine-php/expression.svg?style=flat-square)](https://scrutinizer-ci.com/g/platine-php/expression)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/320791bf3e8a4ff68314e000934ac624)](https://app.codacy.com/gh/platine-php/expression/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/320791bf3e8a4ff68314e000934ac624)](https://app.codacy.com/gh/platine-php/expression/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
