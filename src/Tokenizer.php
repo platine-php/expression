@@ -321,7 +321,7 @@ class Tokenizer
 
     /**
      * Build the reverse polish notation
-     * @return array<Token>
+     * @return Token[]
      */
     public function buildReversePolishNotation(): array
     {
@@ -329,7 +329,7 @@ class Tokenizer
         /** @var SplStack<Token> $stack */
         $stack = new SplStack();
 
-        /** @var SplStack<Int> $paramCounter */
+        /** @var SplStack<int> $paramCounter */
         $paramCounter = new SplStack();
         foreach ($this->tokens as $token) {
             switch ($token->getType()) {
@@ -421,8 +421,10 @@ class Tokenizer
 
         while ($stack->count() !== 0) {
             if (
-                Token::LEFT_PARENTHESIS === $stack->top()->getType()
-                || Token::RIGHT_PARENTHESIS === $stack->top()->getType()
+                in_array(
+                    $stack->top()->getType(),
+                    [Token::LEFT_PARENTHESIS, Token::RIGHT_PARENTHESIS]
+                )
             ) {
                 throw new IncorrectBracketsException('Incorrect brackets');
             }
@@ -481,7 +483,7 @@ class Tokenizer
      */
     protected function isAlpha(string $chr): bool
     {
-        return $chr >= 'a' && $chr <= 'z' || $chr >= 'A' && $chr <= 'Z' || $chr == '_';
+        return $chr >= 'a' && $chr <= 'z' || $chr >= 'A' && $chr <= 'Z' || $chr === '_';
     }
 
     /**
@@ -491,7 +493,7 @@ class Tokenizer
      */
     protected function isDot(string $chr): bool
     {
-        return $chr == '.';
+        return $chr === '.';
     }
 
     /**
@@ -501,7 +503,7 @@ class Tokenizer
      */
     protected function isLeftParenthesis(string $chr): bool
     {
-        return $chr == '(';
+        return $chr === '(';
     }
 
     /**
@@ -511,7 +513,7 @@ class Tokenizer
      */
     protected function isRightParenthesis(string $chr): bool
     {
-        return $chr == ')';
+        return $chr === ')';
     }
 
     /**
@@ -521,6 +523,6 @@ class Tokenizer
      */
     protected function isComma(string $chr): bool
     {
-        return $chr == ',';
+        return $chr === ',';
     }
 }

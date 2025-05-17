@@ -47,9 +47,9 @@ declare(strict_types=1);
 
 namespace Platine\Expression;
 
+use InvalidArgumentException;
 use Platine\Expression\Exception\DivisionByZeroException;
 use Platine\Expression\Exception\UnknownVariableException;
-use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * @class Executor
@@ -59,7 +59,7 @@ class Executor
 {
     /**
      * The variable list
-     * @var array<string, int|float>
+     * @var array<string, mixed>
      */
     protected array $variables = [];
 
@@ -113,9 +113,9 @@ class Executor
      * Execute the expression and return the result
      * @param string $expression
      * @param bool $cache
-     * @return int|float|string|null
+     * @return mixed
      */
-    public function execute(string $expression, bool $cache = true)
+    public function execute(string $expression, bool $cache = true): mixed
     {
         $cacheKey = $expression;
         if (!array_key_exists($cacheKey, $this->caches)) {
@@ -132,7 +132,11 @@ class Executor
 
         $calculator = new Calculator($this->functions, $this->operators);
 
-        return $calculator->calculate($tokens, $this->variables, $this->variableNotFoundHandler);
+        return $calculator->calculate(
+            $tokens,
+            $this->variables,
+            $this->variableNotFoundHandler
+        );
     }
 
     /**
@@ -170,9 +174,9 @@ class Executor
     /**
      * Return the value for the given variable name
      * @param string $name
-     * @return int|float
+     * @return mixed
      */
-    public function getVariable(string $name)
+    public function getVariable(string $name): mixed
     {
         if (! array_key_exists($name, $this->variables)) {
             if ($this->variableNotFoundHandler !== null) {
@@ -194,7 +198,7 @@ class Executor
      * @param mixed $value
      * @return $this
      */
-    public function setVariable(string $name, $value): self
+    public function setVariable(string $name, mixed $value): self
     {
         if ($this->variableValidationHandler !== null) {
             call_user_func($this->variableValidationHandler, $name, $value);
@@ -208,7 +212,7 @@ class Executor
      * Set the variables using array
      * @param array<string, mixed> $variables
      * @param bool $clear whether to clear all existing variables
-     * @return self
+     * @return $this
      */
     public function setVariables(array $variables, bool $clear = true): self
     {
@@ -419,7 +423,7 @@ class Executor
                     return array_sum($arg1) / count($arg1);
                 }
 
-                $args = [$arg1, ...$args];
+                $args = [$arg1, ...array_values($args)];
                 return array_sum($args) / count($args);
             },
             'ceil' => static function ($arg) {
@@ -449,14 +453,14 @@ class Executor
                     throw new InvalidArgumentException('Array must contains at least one element');
                 }
 
-                return max(is_array($arg1) ? $arg1 : [$arg1, ...$args]);
+                return max(is_array($arg1) && count($arg1) > 0 ? $arg1 : [$arg1, ...array_values($args)]);
             },
             'min' => static function ($arg1, ...$args) {
                 if (is_array($arg1) && count($arg1) === 0) {
                     throw new InvalidArgumentException('Array must contains at least one element');
                 }
 
-                return min(is_array($arg1) ? $arg1 : [$arg1, ...$args]);
+                return min(is_array($arg1) && count($arg1) > 0  ? $arg1 : [$arg1, ...array_values($args)]);
             },
             'pow' => static fn($arg1, $arg2) => $arg1 ** $arg2,
             'round' => static function ($arg, int $precision = 0) {

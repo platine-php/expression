@@ -36,6 +36,10 @@ namespace Platine\Expression\Exception;
 
 use Exception;
 
+/**
+ * @class ExpressionException
+ * @package Platine\Expression\Exception
+ */
 class ExpressionException extends Exception
 {
 }

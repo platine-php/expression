@@ -67,24 +67,6 @@ class Token
     public const SPACE = 'space';
 
     /**
-     * The token type
-     * @var string
-     */
-    protected string $type = self::LITERAL;
-
-    /**
-     * The token value
-     * @var mixed
-     */
-    protected $value;
-
-    /**
-     * The token name
-     * @var string|null
-     */
-    protected ?string $name;
-
-    /**
      * The function number of parameter
      * @var int
      */
@@ -92,15 +74,15 @@ class Token
 
     /**
      * Create new instance
-     * @param string $type
-     * @param mixed $value
-     * @param string|null $name
+     * @param string $type The token type
+     * @param mixed $value The token value
+     * @param string|null $name The token name
      */
-    public function __construct(string $type, $value, ?string $name = null)
-    {
-        $this->name = $name;
-        $this->value = $value;
-        $this->type = $type;
+    public function __construct(
+        protected string $type,
+        protected mixed $value,
+        protected ?string $name = null
+    ) {
     }
 
     /**
@@ -116,7 +98,7 @@ class Token
      * Return the token value
      * @return mixed
      */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }
@@ -155,7 +137,7 @@ class Token
      * @param mixed $value
      * @return $this
      */
-    public function setValue($value): self
+    public function setValue(mixed $value): self
     {
         $this->value = $value;
         return $this;

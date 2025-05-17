@@ -47,6 +47,7 @@ declare(strict_types=1);
 
 namespace Platine\Expression;
 
+use Closure;
 use Platine\Expression\Exception\IncorrectExpressionException;
 use ReflectionFunction;
 
@@ -57,30 +58,6 @@ use ReflectionFunction;
 class Operator
 {
     /**
-     * The operator like =, >=, ...
-     * @var string
-     */
-    protected string $operator = '';
-
-    /**
-     * Whether the operator is or right associativity
-     * @var bool
-     */
-    protected bool $isRightAssociative = false;
-
-    /**
-     * The priority of the operator
-     * @var int
-     */
-    protected int $priority = 0;
-
-    /**
-     * The function to be called
-     * @var callable(SplStack)
-     */
-    protected $function;
-
-    /**
      * Number of function argument
      * @var int
      */
@@ -88,29 +65,29 @@ class Operator
 
     /**
      * Create new instance
-     * @param string $operator
-     * @param bool $isRightAssociative
-     * @param int $priority
-     * @param callable $function
+     * @param string $operator The operator like =, >=, ..
+     * @param bool $isRightAssociative Whether the operator is or right associativity
+     * @param int $priority The priority of the operator
+     * @param callable $function The function to be called
      */
     public function __construct(
-        string $operator,
-        bool $isRightAssociative,
-        int $priority,
-        callable $function
+        protected string $operator,
+        protected bool $isRightAssociative,
+        protected int $priority,
+        protected $function
     ) {
         $this->operator = $operator;
         $this->isRightAssociative = $isRightAssociative;
         $this->priority = $priority;
         $this->function = $function;
 
-        $reflection = new ReflectionFunction($function);
+        $reflection = new ReflectionFunction(Closure::fromCallable($function));
         $this->places = $reflection->getNumberOfParameters();
     }
 
     /**
      * Execute the expression for this operator
-     * @param array<Token> $stack
+     * @param Token[] $stack
      * @return Token
      */
     public function execute(array &$stack): Token

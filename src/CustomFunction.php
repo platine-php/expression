@@ -47,6 +47,7 @@ declare(strict_types=1);
 
 namespace Platine\Expression;
 
+use Closure;
 use Platine\Expression\Exception\IncorrectNumberOfFunctionParametersException;
 use ReflectionFunction;
 
@@ -57,18 +58,6 @@ use ReflectionFunction;
 class CustomFunction
 {
     /**
-     * The function name
-     * @var string
-     */
-    protected string $name = '';
-
-    /**
-     * The function to be called
-     * @var callable
-     */
-    protected $function;
-
-    /**
      * Number of function argument required
      * @var int
      */
@@ -76,21 +65,21 @@ class CustomFunction
 
     /**
      * Create new instance
-     * @param string $name
-     * @param callable $function
+     * @param string $name The function name
+     * @param callable $function The function to be called
      */
-    public function __construct(string $name, callable $function)
+    public function __construct(protected string $name, protected $function)
     {
         $this->name = $name;
         $this->function = $function;
 
-        $reflection = new ReflectionFunction($function);
+        $reflection = new ReflectionFunction(Closure::fromCallable($function));
         $this->requiredParamCount = $reflection->getNumberOfRequiredParameters();
     }
 
     /**
      * Execute the function
-     * @param array<Token> $stack
+     * @param Token[] $stack
      * @param int $stackParamCount
      * @return Token
      */

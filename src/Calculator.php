@@ -60,44 +60,30 @@ use Platine\Expression\Token;
 class Calculator
 {
     /**
-     * The list of functions
-     * @var array<string, CustomFunction>
-     */
-    protected array $functions = [];
-
-    /**
-     * The list of operators
-     * @var array<string, Operator>
-     */
-    protected array $operators = [];
-
-    /**
      * Create new instance
      * @param array<string, CustomFunction> $functions
      * @param array<string, Operator> $operators
      */
-    public function __construct(array $functions, array $operators)
+    public function __construct(protected array $functions, protected array $operators)
     {
-        $this->functions = $functions;
-        $this->operators = $operators;
     }
 
     /**
      * Calculate array of tokens in reverse polish notation
-     * @param array<Token> $tokens
+     * @param Token[] $tokens
      * @param array<string, float|string> $variables
      * @param callable|null $variableNotFoundHandler
-     * @return int|float|string|null
+     * @return mixed
      */
     public function calculate(
         array $tokens,
         array $variables,
         ?callable $variableNotFoundHandler = null
-    ) {
-        /** @var array<Token> $stack */
+    ): mixed {
+        /** @var Token[] $stack */
         $stack = [];
         foreach ($tokens as $token) {
-            if (Token::LITERAL === $token->getType() || Token::STRING === $token->getType()) {
+            if (in_array($token->getType(), [Token::LITERAL, Token::STRING])) {
                 $stack[] = $token;
             } elseif (Token::VARIABLE === $token->getType()) {
                 $variable = $token->getValue();
@@ -120,8 +106,10 @@ class Calculator
                         $token->getValue()
                     ));
                 }
-                $stack[] = $this->functions[$token->getValue()]
-                                        ->execute($stack, $token->getParamCount());
+                $stack[] = $this->functions[$token->getValue()]->execute(
+                    $stack,
+                    $token->getParamCount()
+                );
             } elseif (Token::OPERATOR === $token->getType()) {
                 if (! array_key_exists($token->getValue(), $this->operators)) {
                     throw new UnknownOperatorException(sprintf(
@@ -133,7 +121,7 @@ class Calculator
             }
         }
         $result = array_pop($stack);
-        if ($result === null || ! empty($stack)) {
+        if ($result === null || count($stack) > 0) {
             throw new IncorrectExpressionException('Expression stack is not empty');
         }
 

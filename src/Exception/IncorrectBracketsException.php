@@ -34,6 +34,10 @@ declare(strict_types=1);
 
 namespace Platine\Expression\Exception;
 
+/**
+ * @class IncorrectBracketsException
+ * @package Platine\Expression\Exception
+ */
 class IncorrectBracketsException extends ExpressionException
 {
 }

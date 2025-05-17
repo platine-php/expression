@@ -34,6 +34,10 @@ declare(strict_types=1);
 
 namespace Platine\Expression\Exception;
 
+/**
+ * @class IncorrectFunctionParameterException
+ * @package Platine\Expression\Exception
+ */
 class IncorrectFunctionParameterException extends ExpressionException
 {
 }
