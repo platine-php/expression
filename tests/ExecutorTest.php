@@ -121,7 +121,7 @@ class ExecutorTest extends PlatineTestCase
     {
         $o = new Executor();
         $this->assertEquals(4.25, $o->execute('avg([2, 4, 5, 6])'));
-        $this->assertEquals(2.5, $o->execute('avg(5, [2, 4, 5, 6])'));
+        $this->assertEquals(2.5, $o->execute('avg(5, ...[2, 4, 5, 6])'));
         $this->assertEquals(4.4, $o->execute('avg(5, 2, 4, 5, 6)'));
     }
 
