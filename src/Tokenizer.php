@@ -232,12 +232,12 @@ class Tokenizer
 
                     break;
 
-                case $ch == '"':
+                case $ch === '"':
                     $this->inDoubleQuotedString = true;
 
                     continue 2;
 
-                case $ch == "'":
+                case $ch === "'":
                     $this->inSingleQuotedString = true;
 
                     continue 2;
@@ -416,6 +416,7 @@ class Tokenizer
                     break;
                 case Token::SPACE:
                     // do nothing
+                    $this->tokens[] = new Token(Token::SPACE, '');
             }
         }
 

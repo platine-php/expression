@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Platine\Test\Expression;
 
 use Exception;
+use InvalidArgumentException;
 use Platine\Dev\PlatineTestCase;
 use Platine\Expression\Exception\DivisionByZeroException;
+use Platine\Expression\Exception\ExpressionException;
+use Platine\Expression\Exception\IncorrectBracketsException;
 use Platine\Expression\Exception\IncorrectExpressionException;
 use Platine\Expression\Exception\UnknownFunctionException;
+use Platine\Expression\Exception\UnknownOperatorException;
+use Platine\Expression\Exception\UnknownVariableException;
 use Platine\Expression\Executor;
 
 /**
@@ -19,40 +24,128 @@ use Platine\Expression\Executor;
  */
 class ExecutorTest extends PlatineTestCase
 {
-    /**
-     * @dataProvider expressionsDataProvider
-     */
-    public function testCalculating(string $expression): void
+    /*public function testInvalid(): void
+    {
+        $o = new Executor();
+        $o->setVariable('tnh', [1]);
+
+        //$this->expectException(IncorrectBracketsException::class);
+        $this->assertEquals([1,4], $o->execute('tnh,"foo"'));
+    }
+*/
+
+    public function testInvalidFunctionBracketRight(): void
     {
         $o = new Executor();
 
-        /** @var float $phpResult */
-        eval('$phpResult = ' . $expression . ';');
-
-        try {
-            $result = $o->execute($expression);
-        } catch (Exception $e) {
-            $this->fail(sprintf(
-                'Exception: %s (%s:%d), expression was: %s',
-                get_class($e),
-                $e->getFile(),
-                $e->getLine(),
-                $expression
-            ));
-        }
-        $this->assertEquals($phpResult, $result, "Expression was: {$expression}");
+        $this->expectException(IncorrectBracketsException::class);
+        $o->execute('max)2,');
     }
 
-    /**
-     * @dataProvider incorrectExpressionsDataProvider
-     */
-    public function testIncorrectExpressionException(string $expression): void
+
+    public function testDefaults(): void
     {
         $o = new Executor();
-        $o->setVariables(['a' => 12, 'b' => 24]);
-        $this->expectException(IncorrectExpressionException::class);
-        $o->execute($expression);
+        $this->assertCount(20, $o->getFunctions());
+        $this->assertCount(16, $o->getOperators());
+        $this->assertCount(0, $o->getCaches());
+
+        $o->removeOperator('+');
+        $this->assertCount(15, $o->getOperators());
     }
+
+    public function testVariables(): void
+    {
+        $o = new Executor();
+        $this->assertNull($o->getVariableNotFoundHandler());
+        $this->assertNull($o->getVariableValidationHandler());
+
+        $o->setVariable('a', 13);
+        $this->assertEquals(13, $o->getVariable('a'));
+
+
+        $o->setVariableNotFoundHandler(fn($name) => sprintf('%s.%d', $name, 125));
+        $this->assertIsCallable($o->getVariableNotFoundHandler());
+        $this->assertEquals('c.125', $o->getVariable('c'));
+
+        $o->removeVariable('a');
+        $this->assertCount(2, $o->getVariables()); // we have default variables
+    }
+
+    public function testInvalidOperator(): void
+    {
+        $o = new Executor();
+
+        $this->expectException(UnknownOperatorException::class);
+        $o->execute('2 | 4');
+    }
+
+    public function testInvalidBrackets(): void
+    {
+        $o = new Executor();
+
+        $this->expectException(IncorrectBracketsException::class);
+        $o->execute('max(2,4');
+    }
+
+    public function testSetVariableWithValidation(): void
+    {
+        $o = new Executor();
+        $o->setVariableValidationHandler(function ($name, $value) {
+            if ($name === 'c') {
+                throw new ExpressionException();
+            }
+        });
+
+        $this->expectException(ExpressionException::class);
+        $o->setVariable('c', 13);
+    }
+
+    public function testGetVariableNotFound(): void
+    {
+        $o = new Executor();
+
+        $this->expectException(UnknownVariableException::class);
+        $this->assertNull($o->getVariable('b'));
+    }
+
+
+    public function testClone(): void
+    {
+        $o = new Executor();
+        $oc = clone $o;
+        $this->assertEquals($o, $oc);
+    }
+
+    public function testAvg(): void
+    {
+        $o = new Executor();
+        $this->assertEquals(4.25, $o->execute('avg([2, 4, 5, 6])'));
+        $this->assertEquals(2.5, $o->execute('avg(5, [2, 4, 5, 6])'));
+        $this->assertEquals(4.4, $o->execute('avg(5, 2, 4, 5, 6)'));
+    }
+
+    public function testAvgEmptyArray(): void
+    {
+        $o = new Executor();
+        $this->expectException(InvalidArgumentException::class);
+        $o->execute('avg([])');
+    }
+
+    public function testMaxEmptyArray(): void
+    {
+        $o = new Executor();
+        $this->expectException(InvalidArgumentException::class);
+        $o->execute('max([])');
+    }
+
+    public function testMinEmptyArray(): void
+    {
+        $o = new Executor();
+        $this->expectException(InvalidArgumentException::class);
+        $o->execute('min([])');
+    }
+
 
     public function testUnknownFunctionException(): void
     {
@@ -83,6 +176,9 @@ class ExecutorTest extends PlatineTestCase
     {
         $o = new Executor();
         $o->setVariable('four', 4);
+        $this->assertCount(3, $o->getVariables()); // with default variable pi and e
+        $this->assertTrue($o->variableExist('four'));
+        $this->assertEquals(4, $o->getVariable('four'));
         $this->assertEquals(4, $o->execute('$four'));
         $this->expectException(IncorrectExpressionException::class);
         $this->assertEquals(0.0, $o->execute('$'));
@@ -94,6 +190,13 @@ class ExecutorTest extends PlatineTestCase
         $o = new Executor();
         $this->assertEquals(100, $o->execute('10 ^ 2'));
     }
+
+    public function testStringEscapeDouble(): void
+    {
+        $o = new Executor();
+        $this->assertEquals("test \ demo '", $o->execute("'test \ demo \\''"));
+    }
+
 
     public function testStringEscape(): void
     {
@@ -132,6 +235,40 @@ class ExecutorTest extends PlatineTestCase
             return $args[0];
         });
         $this->assertEquals([3, 3, 3], $o->execute('arr_with_max_elements([[1],array(2,2),[3,3,3]])'));
+    }
+
+    /**
+     * @dataProvider incorrectExpressionsDataProvider
+     */
+    public function testIncorrectExpressionException(string $expression): void
+    {
+        $o = new Executor();
+        $o->setVariables(['a' => 12, 'b' => 24]);
+        $this->expectException(IncorrectExpressionException::class);
+        $o->execute($expression);
+    }
+
+    /**
+     * @dataProvider expressionsDataProvider
+     */
+    public function testCalculating(string $expression): void
+    {
+        $o = new Executor();
+
+        eval('$phpResult = ' . $expression . ';');
+
+        try {
+            $result = $o->execute($expression);
+        } catch (Exception $e) {
+            $this->fail(sprintf(
+                'Exception: %s (%s:%d), expression was: %s',
+                get_class($e),
+                $e->getFile(),
+                $e->getLine(),
+                $expression
+            ));
+        }
+        $this->assertEquals($phpResult, $result, "Expression was: {$expression}");
     }
 
     /**
@@ -211,6 +348,7 @@ class ExecutorTest extends PlatineTestCase
           ['pi()'],
           ['pow(1.5, 3.5)'],
           ['round(1.5)'],
+          ['round(5)'],
           ['round(1.5 + 1)'],
           ['sqrt(1.5)'],
 
