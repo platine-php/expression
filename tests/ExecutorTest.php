@@ -47,11 +47,11 @@ class ExecutorTest extends PlatineTestCase
     {
         $o = new Executor();
         $this->assertCount(20, $o->getFunctions());
-        $this->assertCount(16, $o->getOperators());
+        $this->assertCount(17, $o->getOperators());
         $this->assertCount(0, $o->getCaches());
 
         $o->removeOperator('+');
-        $this->assertCount(15, $o->getOperators());
+        $this->assertCount(16, $o->getOperators());
     }
 
     public function testVariables(): void
@@ -423,6 +423,7 @@ class ExecutorTest extends PlatineTestCase
           ['1 || 0'],
           ['1 && 0 || 1'],
 
+          ['!5'],
           ['5 == 3'],
           ['5 == 5'],
           ['5 != 3'],

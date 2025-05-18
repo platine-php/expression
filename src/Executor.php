@@ -397,6 +397,7 @@ class Executor
             '>' => [static fn($a, $b) => $a > $b, 150, false],
             '<=' => [static fn($a, $b) => $a <= $b, 150, false],
             '<' => [static fn($a, $b) => $a < $b, 150, false],
+            '!' => [static fn($a) => ! $a, 190, false],
         ];
     }
 
