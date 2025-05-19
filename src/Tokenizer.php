@@ -60,7 +60,7 @@ class Tokenizer
 {
     /**
      * List of token
-     * @var array<Token>
+     * @var Token[]
      */
     protected array $tokens = [];
 
@@ -297,7 +297,7 @@ class Tokenizer
                     $this->emptyNumberBufferAsLiteral();
                     $this->emptyStringBufferAsVariable();
 
-                    if ($ch != '$') {
+                    if ($ch !== '$') {
                         if (count($this->tokens) > 0) {
                             if (Token::OPERATOR === $this->tokens[count($this->tokens) - 1]->getType()) {
                                 $token = $this->tokens[count($this->tokens) - 1];
@@ -365,6 +365,7 @@ class Tokenizer
                         }
                         $tokens[] = $stack->pop();
                     }
+
                     $paramCounter->push($paramCounter->pop() + 1);
                     break;
 
@@ -416,7 +417,6 @@ class Tokenizer
                     break;
                 case Token::SPACE:
                     // do nothing
-                    $this->tokens[] = new Token(Token::SPACE, '');
             }
         }
 

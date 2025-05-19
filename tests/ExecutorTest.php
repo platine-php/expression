@@ -24,16 +24,6 @@ use Platine\Expression\Executor;
  */
 class ExecutorTest extends PlatineTestCase
 {
-    /*public function testInvalid(): void
-    {
-        $o = new Executor();
-        $o->setVariable('tnh', [1]);
-
-        //$this->expectException(IncorrectBracketsException::class);
-        $this->assertEquals([1,4], $o->execute('tnh,"foo"'));
-    }
-*/
-
     public function testInvalidFunctionBracketRight(): void
     {
         $o = new Executor();
@@ -41,7 +31,6 @@ class ExecutorTest extends PlatineTestCase
         $this->expectException(IncorrectBracketsException::class);
         $o->execute('max)2,');
     }
-
 
     public function testDefaults(): void
     {
